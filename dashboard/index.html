@@ -16,7 +16,7 @@
 
   <script>
   // Fetch JSON data and render two line charts
-  fetch('../data/sensor_hourly.json')
+  fetch('/drive-train-dash/data/sensor_hourly.json')
     .then(res => res.json())
     .then(data => {
       const labels = data.map(d => d.hour);
