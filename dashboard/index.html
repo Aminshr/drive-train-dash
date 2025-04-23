@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drive-Train Sensor Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 800px; margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>Hourly Drive-Train Metrics</h1>
+  <canvas id="tempChart"></canvas>
+  <canvas id="vibChart"></canvas>
+
+  <script>
+  // Fetch JSON data and render two line charts
+  fetch('/data/sensor_hourly.json')
+    .then(res => res.json())
+    .then(data => {
+      const labels = data.map(d => d.hour);
+      const temps  = data.map(d => d.temp_c);
+      const vibs   = data.map(d => d.vibration);
+
+      new Chart(document.getElementById('tempChart'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Avg Temperature (°C)', data: temps }] },
+        options: { responsive: true }
+      });
+
+      new Chart(document.getElementById('vibChart'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Avg Vibration (g)', data: vibs }] },
+        options: { responsive: true }
+      });
+    })
+    .catch(err => console.error('Failed to load JSON:', err));
+  </script>
+</body>
+</html>
