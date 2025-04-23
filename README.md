@@ -1,3 +1,7 @@
+[![ETL Pipeline](https://github.com/Aminshr/drive-train-dash/actions/workflows/etl.yml/badge.svg)](https://github.com/Aminshr/drive-train-dash/actions)
+[![GitHub Pages](https://github.com/Aminshr/drive-train-dash/actions/workflows/pages/pages-build-deployment/badge.svg)](https://aminshr.github.io/drive-train-dash/dashboard/index.html)
+
+
 # drive-train-dash
 
 A predictive-maintenance & logistics dashboard for drive-train components.
@@ -13,6 +17,9 @@ A predictive-maintenance & logistics dashboard for drive-train components.
 - `requirements.txt` – project dependencies  
 - `.gitignore` – files & folders to ignore (optional)  
 - `README.md` – this file
+
+## Live Demo
+🔗 https://aminshr.github.io/drive-train-dash/dashboard/index.html
 
 ## Getting Started
 
