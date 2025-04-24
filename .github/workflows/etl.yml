@@ -35,6 +35,7 @@ jobs:
           source venv/bin/activate
           python "$GITHUB_WORKSPACE/src/etl.py"
 
+
       - name: Run aggregation
         run: |
           source venv/bin/activate
