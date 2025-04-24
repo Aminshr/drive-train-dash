@@ -5,37 +5,120 @@
   <title>Drive-Train Sensor Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2rem; }
-    canvas { max-width: 800px; margin-bottom: 2rem; }
+    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: auto; }
+    h1 { margin-bottom: 0.5rem; }
+    p { color: #555; margin-top: 0; margin-bottom: 2rem; }
+    .kpi-container { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .kpi-card {
+      flex: 1;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      background: #f9f9f9;
+    }
+    canvas { width: 100%; max-width: 800px; margin-bottom: 2rem; }
   </style>
 </head>
 <body>
-  <h1>Hourly Drive-Train Metrics</h1>
+
+  <h1>Drive-Train Sensor Dashboard</h1>
+  <p>
+    Hourly-aggregated temperature and vibration readings for our simulated
+    drive-train components (past 24 hours). Hover over any point to see exact values.
+  </p>
+
+  <div class="kpi-container">
+    <div class="kpi-card">
+      <h3>Min Temp (°C)</h3>
+      <p id="minTemp">—</p>
+    </div>
+    <div class="kpi-card">
+      <h3>Max Temp (°C)</h3>
+      <p id="maxTemp">—</p>
+    </div>
+    <div class="kpi-card">
+      <h3>Avg Vibration (g)</h3>
+      <p id="avgVib">—</p>
+    </div>
+  </div>
+
+  <h2>Avg Temperature by Hour</h2>
   <canvas id="tempChart"></canvas>
+
+  <h2>Avg Vibration by Hour</h2>
   <canvas id="vibChart"></canvas>
 
   <script>
-  // Fetch JSON data and render two line charts
-  fetch('../data/sensor_hourly.json')
-    .then(res => res.json())
-    .then(data => {
-      const labels = data.map(d => d.hour);
-      const temps  = data.map(d => d.temp_c);
-      const vibs   = data.map(d => d.vibration);
+    // 1. Fetch the JSON (use absolute Pages path to be safe)
+    fetch('/drive-train-dash/data/sensor_hourly.json')
+      .then(r => r.json())
+      .then(data => {
+        // 2. Extract labels & series
+        const labels = data.map(d => d.hour);
+        const temps  = data.map(d => d.temp_c);
+        const vibs   = data.map(d => d.vibration);
 
-      new Chart(document.getElementById('tempChart'), {
-        type: 'line',
-        data: { labels, datasets: [{ label: 'Avg Temperature (°C)', data: temps }] },
-        options: { responsive: true }
-      });
+        // 3. Compute KPIs
+        const minTemp = Math.min(...temps).toFixed(2);
+        const maxTemp = Math.max(...temps).toFixed(2);
+        const avgVib  = (vibs.reduce((a,b)=>a+b,0)/vibs.length).toFixed(3);
 
-      new Chart(document.getElementById('vibChart'), {
-        type: 'line',
-        data: { labels, datasets: [{ label: 'Avg Vibration (g)', data: vibs }] },
-        options: { responsive: true }
-      });
-    })
-    .catch(err => console.error('Failed to load JSON:', err));
+        // 4. Inject KPI values
+        document.getElementById('minTemp').textContent = minTemp;
+        document.getElementById('maxTemp').textContent = maxTemp;
+        document.getElementById('avgVib').textContent  = avgVib;
+
+        // 5. Draw Temperature chart
+        new Chart(
+          document.getElementById('tempChart'),
+          {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Avg Temp (°C)',
+                data: temps,
+                fill: false,
+                tension: 0.3
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { title: { display: true, text: 'Hour' } },
+                y: { title: { display: true, text: 'Temperature (°C)' } }
+              }
+            }
+          }
+        );
+
+        // 6. Draw Vibration chart
+        new Chart(
+          document.getElementById('vibChart'),
+          {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Avg Vibration (g)',
+                data: vibs,
+                fill: false,
+                tension: 0.3
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { title: { display: true, text: 'Hour' } },
+                y: { title: { display: true, text: 'Vibration (g)' } }
+              }
+            }
+          }
+        );
+      })
+      .catch(err => console.error('Failed to load data:', err));
   </script>
+
 </body>
 </html>
